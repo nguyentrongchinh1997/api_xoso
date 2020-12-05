@@ -1,7 +1,7 @@
 ### API truyen88.net
 - Endpoints:
 
-	- Pre-endpoint: **api = "http://192.168.1.111/api"**
+	- Pre-endpoint: **api = "http://192.168.1.111/xoso/public/api"**
 	- Danh sách tỉnh:
 		_GET /province
 
