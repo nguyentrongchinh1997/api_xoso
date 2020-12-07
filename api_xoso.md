@@ -16,6 +16,8 @@
 		_GET /region
 	- Kết quả tìm kiếm theo miền và ngày
 		_GET /result-region?region_id={id}&date{d-m-Y}
+	- Kết quả logan theo ngày và miền
+		_GET /logan?region_id={id}&date={Y-m-d}
 
 - Detail for endpoint:
 
@@ -223,6 +225,37 @@
                   "vietlott_id": "string"
 				  "number": "string"
 				  ....
+              }
+          	}
+          	```
+
+      	- Bad request"
+        	- Status Code: false
+        	- Payload:
+          	```
+          	{
+              "status": false,
+              "message": "error",
+          	}
+          	```
+
+  - **Kết quả logan**
+
+	- GET /logan?region_id={id}&date={Y-m-d}
+
+	- Chú ý: region_id=-1 là miền bắc, các tỉnh lẻ lấy id từ api /province
+
+    - Responses:
+
+      	- OK:
+
+        	- Status Code: true
+        	- Payload:
+          	```
+          	{
+              "status": true,
+              "data": {
+                  "lô": "số lần chưa ra",
               }
           	}
           	```
