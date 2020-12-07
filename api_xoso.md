@@ -4,6 +4,8 @@
 	- Pre-endpoint: **api = "http://192.168.1.111/xoso/public/api"**
 	- Danh sách tỉnh:
 		_GET /province
+	- Kết quả đề theo miền, tỉnh
+		_GET /result-lottery?province_id={number}&date={d-m-Y}
 
 - Detail for endpoint:
 
@@ -23,6 +25,37 @@
               "provinces": {
                   "id": "int",
                   "name": "string",
+              }
+          	}
+          	```
+
+      	- Bad request"
+        	- Status Code: false
+        	- Payload:
+          	```
+          	{
+              "status": false,
+              "message": "error",
+          	}
+          	```
+  - **Kết quả đề theo tỉnh, miền**
+
+	- GET /result-lottery?province_id={number}&date=06-12-2020
+
+	- Chú ý: province_id = -1 nếu là miền bắc, ngược lại là các id của tỉnh đã gửi trong api /province
+    
+    - Responses:
+
+      	- OK:
+
+        	- Status Code: true
+        	- Payload:
+          	```
+          	{
+              "status": true,
+              "data": {
+                  "id": "int",
+                  "gdb": "string"
               }
           	}
           	```
