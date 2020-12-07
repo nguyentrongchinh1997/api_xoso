@@ -8,6 +8,14 @@
 		_GET /result-lottery?province_id={number}&date={d-m-Y}
 	- Kết quả xổ số điện toán theo ngày
 		_GET /xsdt?date=06-12-2020
+	- Danh sách các loại Vietlott
+		_GET /vietlott
+	- Kết quả vietlott theo loại và ngày
+		_GET /result-vietlott?vietlott_id={id}&date={Y-m-d}
+	- Danh sách 3 miền
+		_GET /region
+	- Kết quả tìm kiếm theo miền và ngày
+		_GET /result-region?region_id={id}&date{d-m-Y}
 
 - Detail for endpoint:
 
@@ -88,6 +96,133 @@
               "data": {
                   "dt123": "string",
                   "dt6x36": "string"
+              }
+          	}
+          	```
+
+      	- Bad request"
+        	- Status Code: false
+        	- Payload:
+          	```
+          	{
+              "status": false,
+              "message": "error",
+          	}
+          	```
+
+  - **Danh sách loại Vietlott**
+
+	- GET /vietlott
+
+    - Responses:
+
+      	- OK:
+
+        	- Status Code: true
+        	- Payload:
+          	```
+          	{
+              "status": true,
+              "data": {
+                  "id": "int",
+                  "name": "string"
+              }
+          	}
+          	```
+
+      	- Bad request"
+        	- Status Code: false
+        	- Payload:
+          	```
+          	{
+              "status": false,
+              "message": "error",
+          	}
+          	```
+
+  - **Danh sách các miền**
+
+	- GET /region
+
+    - Responses:
+
+      	- OK:
+
+        	- Status Code: true
+        	- Payload:
+          	```
+          	{
+              "status": true,
+              "data": {
+                  "id": "int",
+                  "name": "string"
+              }
+          	}
+          	```
+
+      	- Bad request"
+        	- Status Code: false
+        	- Payload:
+          	```
+          	{
+              "status": false,
+              "message": "error",
+          	}
+          	```
+
+  - **Kết quả xổ số theo ngày và miền**
+
+	- GET /result-region?region_id={region_id}&date=01-12-2020
+
+	- Chú ý: region_id là id miền trả về từ api /region
+
+    - Responses:
+
+      	- OK:
+
+        	- Status Code: true
+        	- Payload:
+          	```
+          	{
+              "status": true,
+              "data": {
+                  "id": "int",
+                  "gdb": "string"
+				  ....
+              }
+          	}
+          	```
+
+      	- Bad request"
+        	- Status Code: false
+        	- Payload:
+          	```
+          	{
+              "status": false,
+              "message": "error",
+          	}
+          	```
+			  
+  - **Kết quả vietlott theo loại và ngày**
+
+	- GET /result-vietlott?vietlott_id={id}&date={Y-m-d}
+
+	- Chú ý: vietlott_id là id loại vietlott trả về từ api /vietlott
+
+    - Responses:
+
+      	- OK:
+
+        	- Status Code: true
+        	- Payload:
+          	```
+          	{
+              "status": true,
+              "data": {
+                  "id": "int",
+                  "vietlott_id": "string"
+				  "number": "string"
+				  ....
               }
           	}
           	```
