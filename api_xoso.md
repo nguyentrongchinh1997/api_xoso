@@ -6,6 +6,8 @@
 		_GET /province
 	- Kết quả đề theo miền, tỉnh
 		_GET /result-lottery?province_id={number}&date={d-m-Y}
+	- Kết quả xổ số điện toán theo ngày
+		_GET /xsdt?date=06-12-2020
 
 - Detail for endpoint:
 
@@ -56,6 +58,36 @@
               "data": {
                   "id": "int",
                   "gdb": "string"
+              }
+          	}
+          	```
+
+      	- Bad request"
+        	- Status Code: false
+        	- Payload:
+          	```
+          	{
+              "status": false,
+              "message": "error",
+          	}
+          	```
+
+  - **Kết quả xổ số điện toán**
+
+	- GET /xsdt?date=06-12-2020
+
+    - Responses:
+
+      	- OK:
+
+        	- Status Code: true
+        	- Payload:
+          	```
+          	{
+              "status": true,
+              "data": {
+                  "dt123": "string",
+                  "dt6x36": "string"
               }
           	}
           	```
