@@ -18,6 +18,8 @@
 		_GET /result-region?region_id={id}&date{d-m-Y}
 	- Kết quả logan theo ngày và miền
 		_GET /logan?region_id={id}&date={Y-m-d}
+	- Thống kê loto từ 00-99
+		_GET /loto0099/{numberDay}/{regionId}
 
 - Detail for endpoint:
 
@@ -256,6 +258,37 @@
               "status": true,
               "data": {
                   "lô": "số lần chưa ra",
+              }
+          	}
+          	```
+
+      	- Bad request"
+        	- Status Code: false
+        	- Payload:
+          	```
+          	{
+              "status": false,
+              "message": "error",
+          	}
+          	```
+
+  - **Thống kê loto 00-99**
+
+	- GET /loto0099/{numberDay}/{regionId} => /loto0099/10/18
+
+	- Chú ý: numberDay là số lần quay gần nhất, ví dụ numberDay = 10,20,....; regionId = -1 miền Bắc, các tỉnh lẻ là gửi id từ api /province
+
+    - Responses:
+
+      	- OK:
+
+        	- Status Code: true
+        	- Payload:
+          	```
+          	{
+              "status": true,
+              "data": {
+                  "lô": "số lần ra",
               }
           	}
           	```
