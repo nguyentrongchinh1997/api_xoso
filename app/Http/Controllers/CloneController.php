@@ -16,11 +16,11 @@ class CloneController extends Controller
 {
     public function all()
     {
-        for ($year = 2015; $year <= 2020; $year++) {
-            for ($month = 1; $month <= 12; $month++) {
+        for ($year = 2020; $year <= 2020; $year++) {
+            for ($month = 12; $month <= 12; $month++) {
                 $total = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
-                for ($day = 1; $day <= $total; $day++) {
+                for ($day = 10; $day <= $total; $day++) {
                     try {
                         $this->cloneXSMB($day, $month, $year, 1);
                         $this->cloneXsmtAndXsmn($day, $month, $year, 2, 'https://www.minhngoc.net.vn/ket-qua-xo-so/mien-trung/');
@@ -143,7 +143,6 @@ class CloneController extends Controller
 
     public function cloneXsmtAndXsmn($day, $month, $year, $regionId, $url)
     {
-        $day = '08'; $month = '12'; $year = '2020';
         $date = $day . '-' . $month . '-' . $year;
         $link = $url . $date . '.html';
         $check = $this->checkRedirect($link);
@@ -261,8 +260,8 @@ class CloneController extends Controller
     public function xsdt()
     {
         try {
-            for ($year = 2011; $year <= 2020; $year++) {
-                for ($month = 1; $month <= 12; $month++) {
+            for ($year = 2020; $year <= 2020; $year++) {
+                for ($month = 12; $month <= 12; $month++) {
                     $total = cal_days_in_month(CAL_GREGORIAN, $month, $year);
                     for ($day = 1; $day <= $total; $day++) {
                         try {
@@ -321,24 +320,28 @@ class CloneController extends Controller
         $check = $this->checkRedirect($link);
 
         if ($check == true) {
-            // DB::beginTransaction();
             $html = file_get_html_custom($link);
-            $finnish1 = trim($html->find('.result-number .finnish1', 0)->plaintext);
-            $finnish2 = trim($html->find('.result-number .finnish2', 0)->plaintext);
-            $finnish3 = trim($html->find('.result-number .finnish3', 0)->plaintext);
-            $finnish4 = trim($html->find('.result-number .finnish4', 0)->plaintext);
-            $finnish5 = trim($html->find('.result-number .finnish5', 0)->plaintext);
-            $finnish6 = trim($html->find('.result-number .finnish6', 0)->plaintext);
-            echo $finnish1 . ';' . $finnish2 . $finnish3 . ';' . $finnish4 . $finnish5 . $finnish6 . '<hr>';
+
+            if (!empty($html->find('#noidung center img')) && $html->find('#noidung center img', 0)->src == '/upload/image/canhbao.png') {
+                $dt6x36 = NULL;
+            } else {
+                $finnish1 = trim($html->find('.result-number .finnish1', 0)->plaintext);
+                $finnish2 = trim($html->find('.result-number .finnish2', 0)->plaintext);
+                $finnish3 = trim($html->find('.result-number .finnish3', 0)->plaintext);
+                $finnish4 = trim($html->find('.result-number .finnish4', 0)->plaintext);
+                $finnish5 = trim($html->find('.result-number .finnish5', 0)->plaintext);
+                $finnish6 = trim($html->find('.result-number .finnish6', 0)->plaintext);
+                $dt6x36 = $finnish1 . ';' . $finnish2 . ';' . $finnish3 . ';' . $finnish4 . ';' . $finnish5 . ';' . $finnish6;
+            }
+            
             Xsdt::updateOrCreate(
                 [
                     'date' => date('Y-m-d', strtotime($date))
                 ],
                 [
-                    'dt6x36' => $finnish1 . ';' . $finnish2 . ';' . $finnish3 . ';' . $finnish4 . ';' . $finnish5 . ';' . $finnish6
+                    'dt6x36' => $dt6x36
                 ]
             );
-            //DB::commit();
         }
     }
 
@@ -355,7 +358,6 @@ class CloneController extends Controller
             $finnish2 = trim($html->find('.result-number .finnish2', 0)->plaintext);
             $finnish3 = trim($html->find('.result-number .finnish3', 0)->plaintext);
             $finnish4 = trim($html->find('.result-number .finnish4', 0)->plaintext);
-            echo $finnish1 . ';' . $finnish2 . $finnish3 . ';' . $finnish4 . '<hr>';
             Xsdt::updateOrCreate(
                 [
                     'date' => date('Y-m-d', strtotime($date))

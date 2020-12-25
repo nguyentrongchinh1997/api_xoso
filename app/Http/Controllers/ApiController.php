@@ -11,6 +11,7 @@ use App\Models\ResultVietlott;
 use App\Models\Region;
 use App\Models\Number;
 use App\Models\Loto;
+use App\Models\Dream;
 
 class ApiController extends Controller
 {
@@ -199,6 +200,17 @@ class ApiController extends Controller
             }
 
             return response()->json(['status' => true, 'data' => $list], 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
+        } catch (\Throwable $th) {
+            return response()->json(['status' => false, 'message' => 'error']);
+        }
+    }
+
+    public function dream()
+    {
+        try {
+            $data = Dream::select('text', 'number')->get();
+
+            return response()->json(['status' => true, 'data' => $data], 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
         } catch (\Throwable $th) {
             return response()->json(['status' => false, 'message' => 'error']);
         }

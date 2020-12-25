@@ -32,3 +32,5 @@ Route::get('result-vietlott', 'ApiController@resultVietlott');
 Route::get('logan', 'ApiController@logan');
 
 Route::get('loto0099/{numberDay}/{region}', 'ApiController@loto0099');
+
+Route::get('dream', 'ApiController@dream');
