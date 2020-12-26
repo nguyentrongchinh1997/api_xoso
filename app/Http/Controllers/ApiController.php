@@ -105,7 +105,10 @@ class ApiController extends Controller
         try {
             $vietlottType = $request->vietlott_id;
             $date = date('Y-m-d', strtotime($request->date));
-            $result = ResultVietlott::where('vietlott_id', $vietlottType)->where('date', $date)->with('vietlott')->get();
+            $result = ResultVietlott::where('vietlott_id', $vietlottType)
+                                    ->where('date', '<=', $date)
+                                    ->latest('date')
+                                    ->with('vietlott')->first();
 
             return response()->json(['status' => true, 'data' => $result], 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
         } catch (\Throwable $th) {
