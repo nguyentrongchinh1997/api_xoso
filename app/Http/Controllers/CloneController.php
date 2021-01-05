@@ -16,11 +16,11 @@ class CloneController extends Controller
 {
     public function all()
     {
-        for ($year = 2020; $year <= 2020; $year++) {
-            for ($month = 12; $month <= 12; $month++) {
+        for ($year = 2021; $year <= 2021; $year++) {
+            for ($month = 1; $month <= 1; $month++) {
                 $total = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
-                for ($day = 10; $day <= $total; $day++) {
+                for ($day = 1; $day <= 4; $day++) {
                     try {
                         $this->cloneXSMB($day, $month, $year, 1);
                         $this->cloneXsmtAndXsmn($day, $month, $year, 2, 'https://www.minhngoc.net.vn/ket-qua-xo-so/mien-trung/');

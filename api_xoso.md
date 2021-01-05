@@ -21,7 +21,7 @@
 	- Thống kê loto từ 00-99
 		_GET /loto0099/{numberDay}/{regionId}
 	- Thống kê lấy con logan có số ngày lớn nhất và con số có tần suất 10 ngày lớn nhất
-		_GET /statistical?region_id={id}&date={Y-m-d}
+		_GET /statistical?region_id={id}&date={Y-m-d}&number_day=10
 
 - Detail for endpoint:
 
@@ -306,9 +306,9 @@
           	```
   - **Thống kê lấy con logan có số ngày lớn nhất và con số có tần suất 10 ngày lớn nhất**
 
-	- GET /statistical?region_id={id}&date={Y-m-d}
+	- GET /statistical?region_id={id}&date={Y-m-d}&number_day=10
 
-	- Chú ý: date là ngày tùy chọn (thường là lấy ngày hôm nay); regionId = -1 miền Bắc, các tỉnh lẻ là gửi id từ api /province
+	- Chú ý: date là ngày tùy chọn (thường là lấy ngày hôm nay); regionId = -1 miền Bắc, các tỉnh lẻ là gửi id từ api /province; number_day là số ngày nhập
 
     - Responses:
 

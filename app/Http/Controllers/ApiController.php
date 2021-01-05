@@ -222,13 +222,15 @@ class ApiController extends Controller
         try {
             $numbers = Number::all();
             $regionId = $request->region_id;
+            $numberDay = $request->number_day;
             $startTime = date('Y-m-d', strtotime($request->date));
             $dateNow = date('Y-m-d');
-            $date = date('Y-m-d', strtotime("-10 day", strtotime($dateNow)));
+            $date = date('Y-m-d', strtotime("-$numberDay day", strtotime($dateNow)));
         /**
          * Lấy con số có tần suất trong 10 ngày lớn nhất
          */
-            $numberList = $this->getLoto0099($numbers, $dateNow, $date, 10, $regionId);
+            $numberList = $this->getLoto0099($numbers, $dateNow, $date, $numberDay, $regionId);
+            arsort($numberList);
             $array_key_first = array_key_first($numberList);
             $maxNumber10Day[$array_key_first] = $numberList[$array_key_first];
         /**
@@ -240,7 +242,7 @@ class ApiController extends Controller
             $array_key_first2 = array_key_first($logans);
             $maxLogan[$array_key_first2] = $logans[$array_key_first2];
 
-            return response()->json(['status' => true, 'maxNumber10Day' => NULL, 'maxLogan' => $maxLogan]);
+            return response()->json(['status' => true, 'maxNumber10Day' => $maxNumber10Day, 'maxLogan' => $maxLogan]);
         } catch (\Throwable $th) {
             return response()->json(['status' => false, 'message' => 'error']);
         }
