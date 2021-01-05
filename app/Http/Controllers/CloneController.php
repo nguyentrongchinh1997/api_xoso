@@ -373,15 +373,16 @@ class CloneController extends Controller
     public function vietlott()
     {
         try {
-            for ($year = 2016; $year <= 2020; $year++) {
+            for ($year = 2020; $year <= 2020; $year++) {
                 for ($month = 1; $month <= 12; $month++) {
                     $total = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
                     for ($day = 1; $day <= $total; $day++) {
                         try {
-                            $this->getDataVietLott4D($day, $month, $year);
-                            $this->getDataVietlott645($day, $month, $year);
-                            $this->getDataVietlott655($day, $month, $year);
+                            $this->getDataVietLott3D($day, $month, $year);
+                            // $this->getDataVietLott4D($day, $month, $year);
+                            // $this->getDataVietlott645($day, $month, $year);
+                            // $this->getDataVietlott655($day, $month, $year);
                         } catch (\Throwable $th) {
                             echo $th->getMessage() . '<hr>';
                         }
@@ -484,7 +485,7 @@ class CloneController extends Controller
         }
     }
 
-    public function getDataVietLott3D()
+    public function getDataVietLott3D($day, $month, $year)
     {
         $date = $day . '-' . $month . '-' . $year;
         $dayofweek = date('w', strtotime($date)) + 1;
@@ -531,7 +532,7 @@ class CloneController extends Controller
                 $g7['note'] = trim(html_entity_decode($content->find('tbody tr', 6)->find('.noteGiai', 0)->plaintext));
                 $g7['result'] = '';
 
-                $link = 'https://www.minhchinh.com/xo-so-dien-toan-max-3d/25-11-2019.html';
+                $link = 'https://www.minhchinh.com/xo-so-dien-toan-max-3d/' . $date . '.html';
                 $html = file_get_html_custom($link);
                 $content = $html->find('table.table_slmax3d', 0);
                 $amountMax3 = $amountMax3Plus = '';
@@ -542,6 +543,24 @@ class CloneController extends Controller
                         $amountMax3Plus.= trim($row->find('td', 3)->plaintext) . ';';
                     }
                 }
+
+                ResultVietlott::updateOrCreate(
+                    [
+                        'vietlott_id' => config('config.vietlott.max3'),
+                        'date' => date('Y-m-d', strtotime($date))
+                    ],
+                    [
+                        'g1' => json_encode($g1, JSON_UNESCAPED_UNICODE),
+                        'g2' => json_encode($g2, JSON_UNESCAPED_UNICODE),
+                        'g3' => json_encode($g3, JSON_UNESCAPED_UNICODE),
+                        'g4' => json_encode($g4, JSON_UNESCAPED_UNICODE),
+                        'g5' => json_encode($g5, JSON_UNESCAPED_UNICODE),
+                        'g6' => json_encode($g6, JSON_UNESCAPED_UNICODE),
+                        'g7' => json_encode($g7, JSON_UNESCAPED_UNICODE),
+                        'amount_3d' => rtrim($amountMax3, ';'),
+                        'amount_3d_plus' => rtrim($amountMax3Plus, ';')
+                    ]
+                );
             }
         }
     }

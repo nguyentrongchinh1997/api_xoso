@@ -20,6 +20,8 @@
 		_GET /logan?region_id={id}&date={Y-m-d}
 	- Thống kê loto từ 00-99
 		_GET /loto0099/{numberDay}/{regionId}
+	- Thống kê lấy con logan có số ngày lớn nhất và con số có tần suất 10 ngày lớn nhất
+		_GET /statistical?region_id={id}&date={Y-m-d}
 
 - Detail for endpoint:
 
@@ -291,6 +293,35 @@
                   "lô": "số lần ra",
               }
           	}
+          	```
+
+      	- Bad request"
+        	- Status Code: false
+        	- Payload:
+          	```
+          	{
+              "status": false,
+              "message": "error",
+          	}
+          	```
+  - **Thống kê lấy con logan có số ngày lớn nhất và con số có tần suất 10 ngày lớn nhất**
+
+	- GET /statistical?region_id={id}&date={Y-m-d}
+
+	- Chú ý: date là ngày tùy chọn (thường là lấy ngày hôm nay); regionId = -1 miền Bắc, các tỉnh lẻ là gửi id từ api /province
+
+    - Responses:
+
+      	- OK:
+
+        	- Status Code: true
+        	- Payload:
+          	```
+          	{
+				"status":true,
+				"maxNumber10Day":{"31":23},
+				"maxLogan":{"31":23}
+			}
           	```
 
       	- Bad request"

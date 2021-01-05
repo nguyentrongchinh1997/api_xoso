@@ -116,50 +116,52 @@ class ApiController extends Controller
         }
     }
 
+    public function getLogan($startTime, $regionId, $numbers)
+    {
+        $list = array();
+
+        foreach ($numbers as $numberItem) {
+            if ($regionId == -1) {
+                $lotoReappear = Loto::where('number', $numberItem->number)
+                                    ->where('date', '<', $startTime)
+                                    ->where('region_id', 1)
+                                    ->latest('date')
+                                    ->first(); // lấy ngày xuất hiện lại con lô đó của miền Bắc
+                $time = abs(strtotime($startTime) - strtotime($lotoReappear->date)); // khoảng cách ngày từ hôm nay đến hôm nó xuất hiện lại
+                $numberDay = $time/86400 - 1;
+
+                if ($numberDay >= 4) {
+                    $list[$numberItem->number] = $numberDay;
+                }
+                arsort($list); // sắp xếp value theo thứ tự giảm dần
+            } else {
+                $lotoReappear = Loto::where('number', $numberItem->number)
+                                    ->where('date', '<', $startTime)
+                                    ->where('province_id', $regionId)
+                                    ->latest('date')
+                                    ->first(); // lấy ngày xuất hiện lại con lô đó của tỉnh
+                $numberDay = Loto::where('province_id', $regionId)
+                                ->whereBetween('date', [$lotoReappear->date, $startTime])
+                                ->get()->groupBy('date'); // tính số ngày xuất hiện lại con lô đó theo tỉnh
+                $numberDay = count($numberDay) - 1;
+
+                if ($numberDay >= 4) {
+                    $list[$numberItem->number] = $numberDay;
+                }
+                arsort($list); // sắp xếp value theo thứ tự giảm dần
+            }
+        }
+
+        return $list;
+    }
+
     public function logan(Request $request)
     {
         try {
             $numbers = Number::all();
             $startTime = date('Y-m-d', strtotime($request->date));
             $regionId = $request->region_id;
-            $list = array();
-
-            foreach ($numbers as $numberItem) {
-                if ($regionId == -1) {
-                    // $lotoReappear = Loto::where('lotos.number', $numberItem->number)
-                    //                 ->where('lotos.date', '<', $startTime)
-                    //                 ->join('results', 'results.id', '=', 'lotos.result_id')
-                    //                 ->where('results.region_id', 1)
-                    //                 ->latest('lotos.date')
-                    //                 ->first();
-                    $lotoNotReappear = Loto::where('number', $numberItem->number)
-                                        ->where('date', '<', $startTime)
-                                        ->where('region_id', 1)
-                                        ->latest('date')
-                                        ->first(); // lấy ngày xuất hiện lại con lô đó của miền Bắc
-                    $time = abs(strtotime($startTime) - strtotime($lotoNotReappear->date));
-                    $numberDay = $time/86400 - 1;
-    
-                    if ($numberDay >= 4) {
-                        $list[$numberItem->number] = $numberDay;
-                    }
-                    arsort($list); // sắp xếp value theo thứ tự giảm dần
-                } else {
-                    $lotoNotReappear = Loto::where('number', $numberItem->number)
-                                        ->where('date', '<', $startTime)
-                                        ->where('province_id', $regionId)
-                                        ->latest('date')
-                                        ->first(); // lấy ngày xuất hiện lại con lô đó của tỉnh
-                    $numberDay = Loto::where('province_id', $regionId)
-                                    ->whereBetween('date', [$lotoNotReappear->date, $startTime])
-                                    ->get()->groupBy('date'); // tính số ngày xuất hiện lại con lô đó theo tỉnh
-                    $numberDay = count($numberDay) - 1;
-                    if ($numberDay >= 4) {
-                        $list[$numberItem->number] = $numberDay;
-                    }
-                    arsort($list); // sắp xếp value theo thứ tự giảm dần
-                }
-            }
+            $list = $this->getLogan($startTime, $regionId, $numbers);
                         
             return response()->json(['status' => true, 'data' => $list], 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
         } catch (\Throwable $th) {
@@ -167,42 +169,78 @@ class ApiController extends Controller
         }
     }
 
-    public function loto0099(Request $request, $numberDay, $regionId)
+    public function loto0099($numberDay, $regionId)
     {
         try {
-            $list = array();
             $numbers = Number::all();
             $dateNow = date('Y-m-d');
             $date = date('Y-m-d', strtotime("-$numberDay day", strtotime($dateNow)));
-
-            if ($regionId != -1) {
-                $resultLoto = Loto::where('province_id', $regionId)
-                                        ->latest('date')->get()->groupBy('date')->take($numberDay)->toArray();
-                $endDate = array_key_first($resultLoto);
-                $startDate = array_key_last($resultLoto);
-
-                foreach ($numbers as $numberItem) {
-                    $lotoReappear =  Loto::whereBetween('date', [$startDate, $endDate])
-                                           ->where('province_id', $regionId)
-                                            ->where('number', $numberItem->number)
-                                            ->count();
-                    if ($lotoReappear > 0) {
-                        $list[$numberItem->number] = $lotoReappear;
-                    }
-                }
-            } else if ($regionId == -1) {
-                foreach ($numbers as $numberItem) {
-                    $lotoReappear = Loto::where('number', $numberItem->number)
-                                        ->where('region_id', 1)
-                                        ->whereBetween('date', [$date, $dateNow])
-                                        ->count();
-                    if ($lotoReappear > 0) {
-                        $list[$numberItem->number] = $lotoReappear;
-                    }
-                }
-            }
+            $list = $this->getLoto0099($numbers, $dateNow, $date, $numberDay, $regionId);
 
             return response()->json(['status' => true, 'data' => $list], 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
+        } catch (\Throwable $th) {
+            return response()->json(['status' => false, 'message' => 'error']);
+        }
+    }
+
+    public function getLoto0099($numbers, $dateNow, $date, $numberDay, $regionId)
+    {
+        $list = array();
+
+        if ($regionId != -1) {
+            $resultLoto = Loto::where('province_id', $regionId)
+                                    ->latest('date')->get()->groupBy('date')->take($numberDay)->toArray();
+            $endDate = array_key_first($resultLoto);
+            $startDate = array_key_last($resultLoto);
+
+            foreach ($numbers as $numberItem) {
+                $lotoReappear =  Loto::whereBetween('date', [$startDate, $endDate])
+                                       ->where('province_id', $regionId)
+                                        ->where('number', $numberItem->number)
+                                        ->count();
+                if ($lotoReappear > 0) {
+                    $list[$numberItem->number] = $lotoReappear;
+                }
+            }
+        } else if ($regionId == -1) {
+            foreach ($numbers as $numberItem) {
+                $lotoReappear = Loto::where('number', $numberItem->number)
+                                    ->where('region_id', 1)
+                                    ->whereBetween('date', [$date, $dateNow])
+                                    ->count();
+                if ($lotoReappear > 0) {
+                    $list[$numberItem->number] = $lotoReappear;
+                }
+            }
+        }
+
+        return $list;
+    }
+
+    public function statistical(Request $request)
+    {
+        try {
+            $numbers = Number::all();
+            $regionId = $request->region_id;
+            $startTime = date('Y-m-d', strtotime($request->date));
+            $dateNow = date('Y-m-d');
+            $date = date('Y-m-d', strtotime("-10 day", strtotime($dateNow)));
+        /**
+         * Lấy con số có tần suất trong 10 ngày lớn nhất
+         */
+            $numberList = $this->getLoto0099($numbers, $dateNow, $date, 10, $regionId);
+            $array_key_first = array_key_first($numberList);
+            $maxNumber10Day[$array_key_first] = $numberList[$array_key_first];
+        /**
+         * Lấy con lô có số ngày lớn nhất
+         */
+            
+            $logans = $this->getLogan($startTime, $regionId, $numbers); // danh sách con lô xuất hiện lại
+            arsort($logans);
+            $array_key_first2 = array_key_first($logans);
+            $maxLogan[$array_key_first2] = $logans[$array_key_first2];
+
+            return response()->json(['status' => true, 'maxNumber10Day' => NULL, 'maxLogan' => $maxLogan]);
         } catch (\Throwable $th) {
             return response()->json(['status' => false, 'message' => 'error']);
         }
