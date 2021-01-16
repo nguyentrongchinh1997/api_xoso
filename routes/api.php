@@ -36,3 +36,7 @@ Route::get('loto0099/{numberDay}/{region}', 'ApiController@loto0099');
 Route::get('/statistical', 'ApiController@statistical');
 
 Route::get('dream', 'ApiController@dream');
+
+Route::post('login', 'ApiController@login');
+
+Route::post('signup', 'ApiController@signup');

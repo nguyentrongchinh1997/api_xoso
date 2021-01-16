@@ -12,13 +12,18 @@ use App\Models\Region;
 use App\Models\Number;
 use App\Models\Loto;
 use App\Models\Dream;
+use App\User;
 
 class ApiController extends Controller
 {
     public function provice()
     {
         try {
-            $provinces = Province::select('id', 'name')->orderBy('name', 'ASC')->get();
+            $provinces = Province::select('id', 'name')
+                                 ->with(['result' => function($query) {
+                                     $query->latest('date')->limit(1);
+                                 }])
+                                 ->orderBy('name', 'ASC')->get();
 
             return response()->json(['status' => true, 'provinces' => $provinces], 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
         } catch (\Throwable $th) {
@@ -215,6 +220,47 @@ class ApiController extends Controller
         }
 
         return $list;
+    }
+
+    public function login(Request $request)
+    {
+        try {
+            if (auth()->attempt(['username' => $request->username, 'password' => $request->password])) {
+                return response()->json(['status' => true, 'message' => 'Đăng nhập thành công']);
+            } else if (auth()->attempt(['phone' => $request->phone, 'password' => $request->password])) {
+                return response()->json(['status' => true, 'message' => 'Đăng nhập thành công']);
+            } else {
+                return response()->json(['status' => false, 'message' => 'Đăng nhập thất bại']);
+            }
+        } catch (\Throwable $th) {
+            return response()->json(['status' => false, 'message' => 'Đăng nhập thất bại']);
+        }
+    }
+
+    public function signup(Request $request)
+    {
+        try {
+            $username = $request->username;
+            $phone = $request->phone;
+            $checkUser = User::where('username', $username)
+                             ->orWhere('phone', $phone)
+                             ->first();
+
+            if (!empty($checkUser)) {
+                return response()->json(['status' => false, 'message' => 'Tài khoản hoặc SĐT đã tồn tại']);
+            } else {
+                User::create([
+                    'username' => $username,
+                    'name' => $request->name,
+                    'phone' => $request->phone,
+                    'password' => bcrypt($request->password)
+                ]);
+
+                return response()->json(['status' => true, 'message' => 'Đăng ký thành công']);
+            }
+        } catch (\Throwable $th) {
+            return response()->json(['status' => false, 'message' => 'Đăng ký thất bại']);
+        }
     }
 
     public function statistical(Request $request)
