@@ -19,6 +19,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('province', 'ApiController@provice');
 
+Route::get('province-date', 'ApiController@getProvinceAndLatestDate');
+
 Route::get('region', 'ApiController@region'); // danh sách 3 miền
 Route::get('result-region', 'ApiController@resultRegion'); // kết quả xổ số theo miền
 
@@ -37,6 +39,8 @@ Route::get('/statistical', 'ApiController@statistical');
 
 Route::get('dream', 'ApiController@dream');
 
-Route::post('login', 'ApiController@login');
+Route::get('login', 'ApiController@login');
 
-Route::post('signup', 'ApiController@signup');
+Route::get('chat', 'ApiController@chat');
+
+Route::get('message', 'ApiController@responseMessage');

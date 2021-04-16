@@ -16,4 +16,10 @@ class Region extends Model
     {
         return $this->hasMany(Result::class);
     }
+
+    public function chat()
+    {
+        return $this->hasMany(Chat::class);
+    }
 }
+

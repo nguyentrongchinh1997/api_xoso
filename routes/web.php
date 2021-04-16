@@ -11,6 +11,32 @@
 |
 */
 
+Route::get('test123', function(){
+    $html = file_get_html_custom('https://novelfull.com/the-record-of-unusual-creatures/chapter-1575-a-short-contact.html');
+    echo $html->find('#chapter-content', 0)->innertext;
+    dd(1);
+    $html = file_get_html_custom('https://www.readlightnovel.org/martial-god-asura');
+        
+    foreach ($html->find('.chapter-chs li') as $li) {
+        $name = $li->find('a', 0)->plaintext . '<br>';
+        dd($name);
+        $slug = str_slug($name);
+        $link = $li->find('a', 0)->href;
+        $html = file_get_html_custom($link);
+        $checkEmpty = DB::table('chapter1s')->where('link', $link)->select('link')->first();
+        
+        if (empty($checkEmpty)) {
+            DB::table('chapter1s')->insert([
+                'name' => $name,
+                'slug' => $slug,
+                'link' => $link,
+                'story_id' => 892,
+                'content' => $html->find('#growfoodsmart', 0)->innertext
+            ]);
+        }
+    }
+});
+
 Route::get('test1', function(){
     // $request = array(
     //     'http' => array(

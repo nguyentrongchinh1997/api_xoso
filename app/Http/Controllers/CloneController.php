@@ -20,7 +20,7 @@ class CloneController extends Controller
             for ($month = 1; $month <= 1; $month++) {
                 $total = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
-                for ($day = 1; $day <= 4; $day++) {
+                for ($day = 28; $day <= 28; $day++) {
                     try {
                         $this->cloneXSMB($day, $month, $year, 1);
                         $this->cloneXsmtAndXsmn($day, $month, $year, 2, 'https://www.minhngoc.net.vn/ket-qua-xo-so/mien-trung/');
@@ -380,9 +380,9 @@ class CloneController extends Controller
                     for ($day = 1; $day <= $total; $day++) {
                         try {
                             $this->getDataVietLott3D($day, $month, $year);
-                            // $this->getDataVietLott4D($day, $month, $year);
-                            // $this->getDataVietlott645($day, $month, $year);
-                            // $this->getDataVietlott655($day, $month, $year);
+                            $this->getDataVietLott4D($day, $month, $year);
+                            $this->getDataVietlott645($day, $month, $year);
+                            $this->getDataVietlott655($day, $month, $year);
                         } catch (\Throwable $th) {
                             echo $th->getMessage() . '<hr>';
                         }

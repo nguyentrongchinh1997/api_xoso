@@ -13,22 +13,52 @@ use App\Models\Number;
 use App\Models\Loto;
 use App\Models\Dream;
 use App\User;
+use DB;
+use App\Models\Chat;
 
 class ApiController extends Controller
 {
     public function provice()
     {
         try {
-            $provinces = Province::select('id', 'name')
-                                 ->with(['result' => function($query) {
-                                     $query->latest('date')->limit(1);
-                                 }])
-                                 ->orderBy('name', 'ASC')->get();
+            $provinces = Province::select('name', 'id')
+                                 ->orderBy('name', 'ASC')
+                                 ->get();
 
             return response()->json(['status' => true, 'provinces' => $provinces], 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
         } catch (\Throwable $th) {
             return response()->json(['status' => false, 'message' => 'error']);
         }
+    }
+
+    public function getProvinceAndLatestDate()
+    {
+        try {
+            $provinces = Province::select('name', 'id')
+                                 ->orderBy('name', 'ASC')
+                                 ->get();
+            foreach ($provinces as $provinceItem) {
+                $list['name'] = $provinceItem->name;
+                $list['id'] = $provinceItem->id;
+                $list['date'] = $this->getLatestDate($provinceItem->id)->date;
+                $res[] = $list;
+            }
+            $result = Result::where('region_id', 1)->select('date', 'province_id')->latest('date')->first(); // miền bắc
+            $res[] = [
+                'name' => 'Miền Bắc',
+                'id' => -1,
+                'date' => $result->date
+            ];
+            
+            return response()->json(['status' => true, 'data' => $res], 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
+        } catch (\Throwable $th) {
+            return response()->json(['status' => false, 'message' => 'error']);
+        }
+    }
+
+    public function getLatestDate($provinceId)
+    {
+        return Result::where('province_id', $provinceId)->select('date', 'province_id')->latest('date')->first();
     }
 
     public function resultLottery(Request $request)
@@ -222,7 +252,7 @@ class ApiController extends Controller
         return $list;
     }
 
-    public function login(Request $request)
+    public function loginOld(Request $request)
     {
         try {
             if (auth()->attempt(['username' => $request->username, 'password' => $request->password])) {
@@ -234,6 +264,53 @@ class ApiController extends Controller
             }
         } catch (\Throwable $th) {
             return response()->json(['status' => false, 'message' => 'Đăng nhập thất bại']);
+        }
+    }
+
+    public function login(Request $request)
+    {
+        try {
+            User::updateOrCreate(
+                [
+                    'client_id' => $request->id
+                ],[
+                    'name' => $request->name,
+                    'image' => $request->image
+                ]
+            );
+
+            return response()->json(['status' => true, 'userId' => $request->id, 'image' => $request->image]);
+        } catch (\Throwable $th) {
+            return response()->json(['status' => false, 'message' => 'Đăng nhập thất bại']);
+        }
+    }
+
+    public function chat(Request $request)
+    {
+        try {
+            $params = $request->all();
+            $user = User::where('client_id', $params['user_id'])->first();
+            $params['user_id'] = $user->id;
+            Chat::create($params);
+
+            return response()->json(['status' => true]);
+        } catch (\Throwable $th) {
+            return response()->json(['status' => false]);
+        }
+    }
+
+    public function responseMessage(Request $request)
+    {
+        try {
+            $messages = Chat::where('region_id', $request->region_id)
+                             ->latest('id')
+                             ->with(['user', 'region'])
+                             ->paginate(20, ['*'], 'page', $request->pageNum)->toArray();
+
+            return response()->json(['status' => true, 'messages' => $messages['data']], 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
+        } catch (\Throwable $th) {
+            dd($th->getMessage());
+            return response()->json(['status' => false]);
         }
     }
 
